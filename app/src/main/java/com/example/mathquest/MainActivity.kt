@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -25,9 +26,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -82,7 +87,7 @@ fun MainScreen() {
             modifier = Modifier
                 .height(80.dp)
                 .width(350.dp),
-            shape = RoundedCornerShape(12.dp),
+            shape = RoundedCornerShape(15.dp),
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color(0xFF4DA6FF)
             )
@@ -101,8 +106,8 @@ fun MainScreen() {
             modifier = Modifier
                 .height(80.dp)
                 .width(350.dp)
-                .border(2.dp, Color.Gray, RoundedCornerShape(12.dp)),
-            shape = RoundedCornerShape(12.dp),
+                .border(1.dp, Color.Gray, RoundedCornerShape(15.dp)),
+            shape = RoundedCornerShape(15.dp),
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color(0xFFFFFFFF)
             )
@@ -117,11 +122,37 @@ fun MainScreen() {
 
         Spacer(modifier = Modifier.height(30.dp))
 
-        Text(
-            text = "Have a teacher account? Sign in",
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Medium,
-            color = Color.Black
-        )
+        TeacherSignInText(onSignInClick = {
+            /* TODO: navigate to login */
+        })
     }
+}
+
+@Composable
+fun TeacherSignInText(onSignInClick: () -> Unit) {
+    val annotatedString = buildAnnotatedString {
+        append("Have a teacher account? ")
+        pushStringAnnotation(tag = "SIGN_IN", annotation = "sign_in")
+        withStyle(
+            style = SpanStyle(
+                color = Color(0xFF214A80),
+                textDecoration = TextDecoration.Underline,
+                fontWeight = FontWeight.Medium
+            )
+        ) {
+            append("Sign in")
+        }
+        pop()
+    }
+
+    Text(
+        text = annotatedString,
+        fontSize = 20.sp,
+        fontWeight = FontWeight.Medium,
+        color = Color.Black,
+        modifier = Modifier.clickable {
+            /* TODO: navigate to login */
+            onSignInClick()
+        }
+    )
 }
