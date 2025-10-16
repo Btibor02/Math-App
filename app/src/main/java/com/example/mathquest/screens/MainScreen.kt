@@ -83,7 +83,7 @@ fun MainScreen(navController: NavController) {
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(
-            onClick = {/* TODO: navigate to register */ },
+            onClick = {navController.navigate(Screen.Registration.route) },
             modifier = Modifier
                 .height(80.dp)
                 .width(350.dp)

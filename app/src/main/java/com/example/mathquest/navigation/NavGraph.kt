@@ -6,11 +6,13 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.mathquest.screens.MainScreen
 import com.example.mathquest.screens.LoginScreen
+import com.example.mathquest.screens.RegistrationScreen
 
 
 sealed class Screen(val route: String) {
     object Main : Screen("main")
     object Login : Screen("login")
+    object Registration : Screen("registration")
 }
 
 @Composable
@@ -24,6 +26,9 @@ fun NavGraph(navController: NavHostController) {
         }
         composable(Screen.Login.route) {
             LoginScreen(navController)
+        }
+        composable(Screen.Registration.route) {
+            RegistrationScreen(navController)
         }
     }
 }
