@@ -1,4 +1,4 @@
-package com.example.mathquest.mathlogic 
+package com.example.mathquest.mathlogic
 
 import android.os.CountDownTimer
 
@@ -14,7 +14,7 @@ object TimerLogic{
         onTick: ((Int) -> Unit)? = null,
         onFinish: (() -> Unit)? = null
 
-        ){
+    ){
         //stop existin timer
         timer?.cancel()
 
@@ -40,7 +40,7 @@ object TimerLogic{
         onTick: ((Int) -> Unit)? = null,
         onFinish: (() -> Unit)? = null
     ){
-       stopTimer()
+        stopTimer()
         startTimer(seconds, onTick, onFinish)
     }
 }
