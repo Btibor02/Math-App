@@ -91,14 +91,12 @@ fun LoginScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(30.dp))
 
-        SignUpPrompt(onSignUpClick = {
-            /* TODO: navigate to register */
-        })
+        SignUpPrompt(navController = navController)
     }
 }
 
 @Composable
-fun SignUpPrompt(onSignUpClick: () -> Unit) {
+fun SignUpPrompt(navController: NavController) {
     val annotatedString = buildAnnotatedString {
         append("New here? ")
         pushStringAnnotation(tag = "SIGN_UP", annotation = "sign_up")
@@ -120,8 +118,10 @@ fun SignUpPrompt(onSignUpClick: () -> Unit) {
         fontWeight = FontWeight.Medium,
         color = Color.Black,
         modifier = Modifier.clickable {
-            /* TODO: navigate to login */
-            onSignUpClick()
+            navController.navigate(Screen.Registration.route) {
+                popUpTo(Screen.Login.route) { inclusive = true }
+                launchSingleTop = true
+            }
         }
     )
 }
