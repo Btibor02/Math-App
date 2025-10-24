@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.example.mathquest.screens.GradeSelectionScreen
 import com.example.mathquest.screens.MainScreen
 import com.example.mathquest.screens.LoginScreen
 import com.example.mathquest.screens.RegistrationScreen
@@ -13,6 +14,7 @@ sealed class Screen(val route: String) {
     object Main : Screen("main")
     object Login : Screen("login")
     object Registration : Screen("registration")
+    object GradeSelection : Screen("grade_selection")
 }
 
 @Composable
@@ -29,6 +31,9 @@ fun NavGraph(navController: NavHostController) {
         }
         composable(Screen.Registration.route) {
             RegistrationScreen(navController)
+        }
+        composable(Screen.GradeSelection.route) {
+            GradeSelectionScreen(navController)
         }
     }
 }
