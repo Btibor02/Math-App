@@ -1,6 +1,7 @@
 package com.example.mathquest.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -11,13 +12,17 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -157,8 +162,37 @@ fun RegistrationScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(30.dp))
 
-        TextButton({ navController.navigate(Screen.Login.route) }) {
-            Text("Already have an account? Log in", color = Color.Black)
-        }
+        SignInPrompt(navController = navController)
     }
+}
+
+@Composable
+fun SignInPrompt(navController: NavController) {
+    val annotatedString = buildAnnotatedString {
+        append("Already have an account? ")
+        pushStringAnnotation(tag = "SIGN_IN", annotation = "sign_in")
+        withStyle(
+            style = SpanStyle(
+                color = Color(0xFF214A80),
+                textDecoration = TextDecoration.Underline,
+                fontWeight = FontWeight.Medium
+            )
+        ) {
+            append("Sign in")
+        }
+        pop()
+    }
+
+    Text(
+        text = annotatedString,
+        fontSize = 20.sp,
+        fontWeight = FontWeight.Medium,
+        color = Color.Black,
+        modifier = Modifier.clickable {
+            navController.navigate(Screen.Login.route) {
+                popUpTo(Screen.Registration.route) { inclusive = true }
+                launchSingleTop = true
+            }
+        }
+    )
 }
