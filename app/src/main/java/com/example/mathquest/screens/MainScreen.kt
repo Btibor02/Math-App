@@ -103,14 +103,12 @@ fun MainScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(30.dp))
 
-        TeacherSignInText(onSignInClick = {
-            /* TODO: navigate to login */
-        })
+        TeacherSignInText(navController = navController)
     }
 }
 
 @Composable
-fun TeacherSignInText(onSignInClick: () -> Unit) {
+fun TeacherSignInText(navController: NavController) {
     val annotatedString = buildAnnotatedString {
         append("Have a teacher account? ")
         pushStringAnnotation(tag = "SIGN_IN", annotation = "sign_in")
@@ -132,8 +130,8 @@ fun TeacherSignInText(onSignInClick: () -> Unit) {
         fontWeight = FontWeight.Medium,
         color = Color.Black,
         modifier = Modifier.clickable {
-            /* TODO: navigate to login */
-            onSignInClick()
+            navController.navigate(Screen.TeacherOverview.route) {
+            }
         }
     )
 }
