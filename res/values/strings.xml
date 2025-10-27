@@ -1,0 +1,7 @@
+<resources>
+    <string name="parent_dashboard">Parent Dashboard</string>
+    <string name="overall_accuracy_fmt">Overall accuracy: %1$d%%</string>
+    <string name="total_sessions_fmt">Total sessions: %1$d</string>
+    <string name="best_streak_fmt">Best streak: %1$d</string>
+    <string name="recent_results">Recent results</string>
+</resources>
