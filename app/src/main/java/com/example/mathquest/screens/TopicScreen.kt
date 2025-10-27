@@ -1,20 +1,16 @@
 package com.example.mathquest.screens
 
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.MenuBook
-import androidx.compose.material.icons.filled.Calculate
-import androidx.compose.material.icons.filled.Computer
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.HorizontalRule
 import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.School
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.filled.Straighten
+import androidx.compose.material.icons.filled.Percent
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -24,6 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -32,14 +29,12 @@ import androidx.navigation.NavController
 import com.example.mathquest.R
 
 @Composable
-fun GradeSelectionScreen(navController: NavController) {
-    val grades: List<Triple<String, ImageVector, Color>> = listOf(
-        Triple("1. grade", Icons.Filled.School, Color(0xFFFFF176)),
-        Triple("2. grade", Icons.Filled.Calculate, Color(0xFFA5D6A7)),
-        Triple("3. grade", Icons.Filled.Computer, Color(0xFFFFAB91)),
-        Triple("4. grade", Icons.Filled.Straighten, Color(0xFF90CAF9)),
-        Triple("5. grade", Icons.AutoMirrored.Filled.MenuBook, Color(0xFFCE93D8)),
-        Triple("6. grade", Icons.Filled.Star, Color(0xFFFFCC80))
+fun TopicSelectionScreen(navController: NavController) {
+    val topics: List<Triple<String, ImageVector, Color>> = listOf(
+        Triple("Addition", Icons.Filled.Add, Color(0xFFFFF176)),
+        Triple("Subtraction", Icons.Filled.HorizontalRule, Color(0xFFA5D6A7)),
+        Triple("Multiplication", Icons.Filled.Clear, Color(0xFFFFAB91)),
+        Triple("Division", Icons.Filled.Percent, Color(0xFF90CAF9))
     )
 
     Box(
@@ -55,7 +50,7 @@ fun GradeSelectionScreen(navController: NavController) {
                 .padding(top = 60.dp)
         ) {
             Text(
-                text = "Choose your grade!",
+                text = "Choose a topic!",
                 fontSize = 60.sp,
                 fontWeight = FontWeight.Bold,
                 fontFamily = FontFamily(Font(R.font.nunito_extrabold)),
@@ -63,6 +58,7 @@ fun GradeSelectionScreen(navController: NavController) {
                 textAlign = TextAlign.Center,
                 style = TextStyle(lineHeight = 70.sp)
             )
+
             Spacer(Modifier.height(40.dp))
 
             LazyColumn(
@@ -70,13 +66,12 @@ fun GradeSelectionScreen(navController: NavController) {
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                items(grades.indices.toList()) { index ->
-                    val (text, icon, color) = grades[index]
+                items(topics.indices.toList()) { index ->
+                    val (text, icon, color) = topics[index]
                     val isLocked = index != 0
 
                     Button(
-                        onClick = { if (!isLocked) {navController.navigate("topic_selection")
-                        } },
+                        onClick = { if (!isLocked) { /* TODO: Navigate to exercises */ } },
                         modifier = Modifier
                             .height(120.dp)
                             .width(350.dp)
@@ -100,7 +95,7 @@ fun GradeSelectionScreen(navController: NavController) {
                                 Spacer(Modifier.width(32.dp))
                                 Text(
                                     text,
-                                    fontSize = 40.sp,
+                                    fontSize = 35.sp,
                                     color = Color(0xFF214A80),
                                     fontWeight = FontWeight.Medium,
                                     fontFamily = FontFamily(Font(R.font.nunito_extrabold))

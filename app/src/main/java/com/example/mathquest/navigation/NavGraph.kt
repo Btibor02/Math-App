@@ -8,6 +8,7 @@ import com.example.mathquest.screens.GradeSelectionScreen
 import com.example.mathquest.screens.MainScreen
 import com.example.mathquest.screens.LoginScreen
 import com.example.mathquest.screens.RegistrationScreen
+import com.example.mathquest.screens.TopicSelectionScreen
 
 
 sealed class Screen(val route: String) {
@@ -15,6 +16,7 @@ sealed class Screen(val route: String) {
     object Login : Screen("login")
     object Registration : Screen("registration")
     object GradeSelection : Screen("grade_selection")
+    object TopicSelection : Screen("topic_selection")
 }
 
 @Composable
@@ -34,6 +36,9 @@ fun NavGraph(navController: NavHostController) {
         }
         composable(Screen.GradeSelection.route) {
             GradeSelectionScreen(navController)
+        }
+        composable(Screen.TopicSelection.route) {
+            TopicSelectionScreen(navController)
         }
     }
 }
