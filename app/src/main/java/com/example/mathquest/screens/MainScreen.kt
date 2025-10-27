@@ -106,6 +106,21 @@ fun MainScreen(navController: NavController) {
         TeacherSignInText(onSignInClick = {
             /* TODO: navigate to login */
         })
+        Button(
+            onClick = { navController.navigate(Screen.Leaderboard.route) },
+            modifier = Modifier
+                .height(80.dp)
+                .width(350.dp),
+            shape = RoundedCornerShape(15.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4DA6FF))
+        ) {
+            Text(
+                "Leaderboard",
+                fontFamily = FontFamily(Font(R.font.nunito_extrabold)),
+                fontSize = 40.sp
+            )
+        }
+
     }
 }
 
