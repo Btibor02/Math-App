@@ -31,10 +31,10 @@ import com.example.mathquest.R
 @Composable
 fun TopicSelectionScreen(navController: NavController) {
     val topics: List<Triple<String, ImageVector, Color>> = listOf(
-        Triple("Addition", Icons.Filled.Add, Color(0xFFFFF176)),
-        Triple("Subtraction", Icons.Filled.HorizontalRule, Color(0xFFA5D6A7)),
-        Triple("Multiplication", Icons.Filled.Clear, Color(0xFFFFAB91)),
-        Triple("Division", Icons.Filled.Percent, Color(0xFF90CAF9))
+        Triple("Add", Icons.Filled.Add, Color(0xFFFFF176)),
+        Triple("Subtract", Icons.Filled.HorizontalRule, Color(0xFFA5D6A7)),
+        Triple("Multiply", Icons.Filled.Clear, Color(0xFFFFAB91)),
+        Triple("Divide", Icons.Filled.Percent, Color(0xFF90CAF9))
     )
 
     Box(
@@ -95,7 +95,7 @@ fun TopicSelectionScreen(navController: NavController) {
                                 Spacer(Modifier.width(32.dp))
                                 Text(
                                     text,
-                                    fontSize = 35.sp,
+                                    fontSize = 44.sp,
                                     color = Color(0xFF214A80),
                                     fontWeight = FontWeight.Medium,
                                     fontFamily = FontFamily(Font(R.font.nunito_extrabold))

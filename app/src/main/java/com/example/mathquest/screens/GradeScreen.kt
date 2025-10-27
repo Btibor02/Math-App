@@ -100,7 +100,7 @@ fun GradeSelectionScreen(navController: NavController) {
                                 Spacer(Modifier.width(32.dp))
                                 Text(
                                     text,
-                                    fontSize = 40.sp,
+                                    fontSize = 44.sp,
                                     color = Color(0xFF214A80),
                                     fontWeight = FontWeight.Medium,
                                     fontFamily = FontFamily(Font(R.font.nunito_extrabold))

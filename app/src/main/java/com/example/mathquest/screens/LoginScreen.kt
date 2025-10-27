@@ -73,7 +73,9 @@ fun LoginScreen(navController: NavController) {
         Spacer(Modifier.height(32.dp))
 
         Button(
-            onClick = { navController.navigate(Screen.GradeSelection.route) },
+            onClick = { navController.navigate(Screen.GradeSelection.route) {
+                popUpTo(Screen.Main.route) { inclusive = false }
+            } },
             modifier = Modifier
                 .height(80.dp)
                 .width(350.dp),
