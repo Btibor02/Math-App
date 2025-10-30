@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -65,6 +67,22 @@ fun ClassOverviewScreen(navController: NavController) {
         StudentTable()
 
         Spacer(Modifier.height(40.dp))
+
+        Button(
+            onClick = {/* TODO */},
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFD54F)),
+            shape = RoundedCornerShape(16.dp),
+            modifier = Modifier
+                .fillMaxWidth(0.6f)
+                .height(60.dp)
+        ) {
+            Text(
+                "Assign Homework",
+                color = Color.Black,
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 18.sp
+            )
+        }
     }
 }
 
