@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.mathquest.R
+import com.example.mathquest.navigation.Screen
 import kotlin.collections.listOf
 
 @Composable
@@ -191,7 +192,7 @@ fun ClassCard(className: String, iconColor: Color, navController: NavController)
                     modifier = Modifier
                         .padding(end = 16.dp)
                         .clickable {
-                        navController.navigate({/* TODO: route to class*/ } )
+                        navController.navigate("class_overview" )
                     }
                 )
             }
