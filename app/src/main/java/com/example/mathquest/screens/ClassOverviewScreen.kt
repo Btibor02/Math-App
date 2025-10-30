@@ -2,7 +2,9 @@ package com.example.mathquest.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -11,6 +13,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -57,6 +61,10 @@ fun ClassOverviewScreen(navController: NavController) {
         SearchBar()
 
         Spacer(Modifier.height(24.dp))
+
+        StudentTable()
+
+        Spacer(Modifier.height(40.dp))
     }
 }
 
@@ -81,4 +89,74 @@ fun SearchBar() {
             .height(60.dp)
             .border(3.dp, Color.Gray, RoundedCornerShape(16.dp)),
     )
+}
+
+@Composable
+fun StudentTable() {
+    val students = listOf(
+        Triple("Emma", 14, 22),
+        Triple("Leo", 9, 18),
+        Triple("Teo", 12, 21),
+        Triple("Joe", 10, 20)
+    )
+
+    Card(
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        modifier = Modifier
+            .fillMaxWidth()
+            .border(3.dp, Color.Gray, RoundedCornerShape(16.dp))
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+        ) {
+            Row(
+                Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    "Name",
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF214A80)
+                )
+                Text(
+                    "Logins",
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF214A80)
+                )
+                Text(
+                    "Task Completed",
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF214A80)
+                )
+            }
+
+            Spacer(Modifier.height(8.dp))
+
+            students.forEach { (name, logins, completed) ->
+                Row(
+                    Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        name,
+                        color = Color.Black,
+                        fontSize = 16.sp
+                    )
+                    Text(
+                        logins.toString(),
+                        color = Color.Black,
+                        fontSize = 16.sp
+                    )
+                    Text(
+                        completed.toString(),
+                        color = Color.Black,
+                        fontSize = 16.sp
+                    )
+                }
+            }
+        }
+    }
 }
