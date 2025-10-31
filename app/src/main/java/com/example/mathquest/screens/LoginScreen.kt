@@ -45,6 +45,8 @@ fun LoginScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(60.dp))
 
+
+        // TODO: Change to email
         OutlinedTextField(
             value = username,
             onValueChange = { username = it },
