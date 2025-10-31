@@ -32,7 +32,7 @@ import com.example.mathquest.navigation.Screen
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegistrationScreen(navController: NavController) {
-    var name by remember { mutableStateOf("") }
+    var username by remember { mutableStateOf("") }
     var grade by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var joinCode by remember { mutableStateOf("") }
@@ -57,8 +57,8 @@ fun RegistrationScreen(navController: NavController) {
         Spacer(modifier = Modifier.height(60.dp))
 
         OutlinedTextField(
-            value = name,
-            onValueChange = { name = it },
+            value = username,
+            onValueChange = { username = it },
             label = { Text("Name") },
             leadingIcon = { Icon(Icons.Default.Person, null) },
             modifier = Modifier
