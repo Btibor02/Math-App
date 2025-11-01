@@ -27,15 +27,23 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.mathquest.R
+import com.example.mathquest.data.UserProfile
+import com.example.mathquest.data.UserRepository
 import com.example.mathquest.navigation.Screen
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegistrationScreen(navController: NavController) {
-    var username by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
     var grade by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var joinCode by remember { mutableStateOf("") }
+    var error by remember { mutableStateOf<String?>(null) }
+    var isLoading by remember {mutableStateOf(false)}
+
+    val repo = remember { UserRepository() }
+    val scope = rememberCoroutineScope()
 
     val grades = listOf("1", "2", "3", "4", "5", "6")
     var expanded by remember { mutableStateOf(false) }
@@ -57,9 +65,9 @@ fun RegistrationScreen(navController: NavController) {
         Spacer(modifier = Modifier.height(60.dp))
 
         OutlinedTextField(
-            value = username,
-            onValueChange = { username = it },
-            label = { Text("Name") },
+            value = email,
+            onValueChange = { email = it },
+            label = { Text("Email") },
             leadingIcon = { Icon(Icons.Default.Person, null) },
             modifier = Modifier
                 .height(80.dp)
@@ -144,22 +152,52 @@ fun RegistrationScreen(navController: NavController) {
         Spacer(Modifier.height(32.dp))
 
         Button(
-            onClick = { navController.navigate(Screen.Main.route) {
-                popUpTo(Screen.Main.route) { inclusive = false }
-            } },
+            onClick = {
+                if (email.isBlank() || password.isBlank() || grade.isBlank() || joinCode.isBlank()) {
+                    error = "Please fill all fields"
+                    return@Button
+                }
+                isLoading = true
+                error = null
+                scope.launch {
+                    val result = repo.registerWithEmail(
+                        email,
+                        password,
+                        UserProfile(username = email, grade = grade, joinCode = joinCode)
+                    )
+                    isLoading = false
+                    result.fold(
+                        onSuccess = {
+                            navController.navigate(Screen.GradeSelection.route) {
+                                popUpTo (Screen.Main.route ) { inclusive = false }
+                            }
+                        },
+                        onFailure = { e -> error = e.message}
+                    )
+                }
+            },
+            enabled = !isLoading,
             modifier = Modifier
                 .height(80.dp)
                 .width(350.dp),
             shape = RoundedCornerShape(15.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF4DA6FF)
-            )
+            colors = ButtonDefaults.buttonColors(Color(0xFF4DA6FF))
         ) {
-            Text(
-                "Register",
-                fontFamily = FontFamily(Font(R.font.nunito_extrabold)),
-                fontSize = 40.sp
-            )
+            if (isLoading) {
+                CircularProgressIndicator(color = Color.White)
+            } else {
+                Text(
+                    "Register",
+                    fontFamily = FontFamily(Font(R.font.nunito_extrabold)),
+                    fontSize = 40.sp
+                )
+            }
+
+        }
+
+        error?.let {
+            Spacer(modifier = Modifier.height(20.dp))
+            Text(it, color = Color.Red, textAlign = TextAlign.Center)
         }
 
         Spacer(modifier = Modifier.height(30.dp))
