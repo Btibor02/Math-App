@@ -10,7 +10,8 @@ data class UserProfile(
     val uid: String = "",
     val username: String = "",
     val grade: String = "",
-    val joinCode: String = ""
+    val joinCode: String = "",
+    val isTeacher: Boolean = false
 )
 
 class UserRepository{

@@ -237,7 +237,7 @@ fun RegistrationScreen(navController: NavController) {
                     val result = repo.registerWithEmail(
                         email,
                         password,
-                        UserProfile(username = username, grade = grade, joinCode = joinCode)
+                        UserProfile(username = username, grade = grade, joinCode = joinCode, isTeacher = false)
                     )
                     isLoading = false
                     result.fold(
