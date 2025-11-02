@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
@@ -26,6 +27,12 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -37,9 +44,42 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.mathquest.R
+import com.example.mathquest.data.ClassInfo
+import com.example.mathquest.data.FirestoreService
+import com.google.firebase.auth.FirebaseAuth
 
 @Composable
-fun TeacherOverviewScreen(navController: NavController) {
+fun TeacherOverviewScreen(navController: NavController, firestoreService: FirestoreService) {
+    var teacherName by remember {mutableStateOf("Teacher")}
+    var teacherClasses by remember { mutableStateOf(listOf<ClassInfo>()) }
+    var isLoading by remember { mutableStateOf(true) }
+    var error by remember { mutableStateOf<String?>(null) }
+
+    val scope = rememberCoroutineScope()
+    val colorPalette = listOf(
+        Color(0xFF90CAF9),
+        Color(0xFFA5D6A7),
+        Color(0xFFFFD54F)
+    )
+
+    LaunchedEffect(Unit) {
+        val uid = FirebaseAuth.getInstance().currentUser?.uid
+        if (uid != null) {
+            try {
+                val teacher = firestoreService.getTeacherById(uid)
+                teacherName = teacher?.username ?: "Teacher"
+
+                val classes = firestoreService.getClassesByTeacher(uid)
+                teacherClasses = classes
+            } catch (e: Exception) {
+                error = e.message
+            } finally {
+                isLoading = false
+            }
+
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -48,7 +88,7 @@ fun TeacherOverviewScreen(navController: NavController) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Welcome,\nMs. Anna!",
+            text = "Welcome,\n${teacherName}!",
             fontSize = 36.sp,
             fontWeight = FontWeight.Bold,
             color = Color(0xFF214A80),
@@ -83,16 +123,9 @@ fun TeacherOverviewScreen(navController: NavController) {
             verticalArrangement = Arrangement.spacedBy(12.dp),
             modifier = Modifier.fillMaxWidth()
         ) {
-            items(
-                listOf(
-                    Pair("Class 1A", Color(0xFF90CAF9)),
-                    Pair("Class 2B", Color(0xFFA5D6A7)),
-                    Pair("Class 3C", Color(0xFFFFD54F)),
-                    Pair("Class 4A", Color(0xFFFFAB91)),
-                    Pair("Class 5B", Color(0xFFCE93D8))
-                )
-            ) { (name, color) ->
-                ClassCard(name, color, navController)
+            itemsIndexed(teacherClasses) { index, classInfo ->
+                val color = colorPalette[index % colorPalette.size]
+                ClassCard(classInfo.className, color, navController)
             }
         }
     }

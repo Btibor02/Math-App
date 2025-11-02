@@ -1,6 +1,7 @@
 package com.example.mathquest.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -13,6 +14,7 @@ import com.example.mathquest.screens.RegistrationScreen
 import com.example.mathquest.screens.TeacherOverviewScreen
 import com.example.mathquest.screens.TopicSelectionScreen
 import androidx.navigation.NavType
+import com.example.mathquest.data.FirestoreService
 
 
 sealed class Screen(val route: String) {
@@ -27,6 +29,7 @@ sealed class Screen(val route: String) {
 
 @Composable
 fun NavGraph(navController: NavHostController) {
+    val firestoreService = remember { FirestoreService() }
     NavHost(
         navController = navController,
         startDestination = Screen.Main.route
@@ -51,7 +54,7 @@ fun NavGraph(navController: NavHostController) {
             TopicSelectionScreen(navController)
         }
         composable(Screen.TeacherOverview.route) {
-            TeacherOverviewScreen(navController)
+            TeacherOverviewScreen(navController, firestoreService)
         }
         composable(Screen.ClassOverview.route) {
             ClassOverviewScreen(navController)

@@ -122,4 +122,19 @@ class FirestoreService {
             null
         }
     }
+
+    suspend fun getClassesByTeacher(teacherId: String): List<ClassInfo> {
+        return try {
+            val querySnapshot = classesRef
+                .whereEqualTo("teacherId", teacherId)
+                .get()
+                .await()
+
+            querySnapshot.documents.mapNotNull { doc ->
+                doc.toObject(ClassInfo::class.java)
+            }
+        } catch (e: Exception) {
+            emptyList()
+        }
+    }
 }
