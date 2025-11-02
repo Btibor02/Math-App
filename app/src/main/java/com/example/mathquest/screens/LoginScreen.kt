@@ -113,10 +113,26 @@ fun LoginScreen(navController: NavController) {
                         onSuccess = { uid ->
                             val db = FirebaseFirestore.getInstance()
                             db.collection("students").document(uid).get()
-                                .addOnSuccessListener { doc ->
-                                    val grade = doc.getString("grade") ?: "1A"
-                                    navController.navigate("grade_selection/$grade") {
-                                        popUpTo(Screen.Login.route) { inclusive = true }
+                                .addOnSuccessListener { studentDoc ->
+                                    if (studentDoc.exists()) {
+                                        val grade = studentDoc.getString("grade") ?: "1A"
+                                        navController.navigate("grade_selection/$grade") {
+                                            popUpTo(Screen.Login.route) { inclusive = true }
+                                        }
+                                    } else {
+                                        db.collection("teachers").document(uid).get()
+                                            .addOnSuccessListener { teacherDoc ->
+                                                if (teacherDoc.exists()) {
+                                                    navController.navigate(Screen.TeacherOverview.route) {
+                                                        popUpTo(Screen.Login.route) { inclusive = true }
+                                                    }
+                                                } else {
+                                                    error = "User not found in students or teachers"
+                                                }
+                                            }
+                                            .addOnFailureListener { e ->
+                                                error = "Failed to fetch teacher info: ${e.message}"
+                                            }
                                     }
                                 }
                                 .addOnFailureListener { e ->

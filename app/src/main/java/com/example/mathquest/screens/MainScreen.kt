@@ -100,38 +100,5 @@ fun MainScreen(navController: NavController) {
                 color = Color(0xFF214A80)
             )
         }
-
-        Spacer(modifier = Modifier.height(30.dp))
-
-        TeacherSignInText(navController = navController)
     }
-}
-
-@Composable
-fun TeacherSignInText(navController: NavController) {
-    val annotatedString = buildAnnotatedString {
-        append("Have a teacher account? ")
-        pushStringAnnotation(tag = "SIGN_IN", annotation = "sign_in")
-        withStyle(
-            style = SpanStyle(
-                color = Color(0xFF214A80),
-                textDecoration = TextDecoration.Underline,
-                fontWeight = FontWeight.Medium
-            )
-        ) {
-            append("Sign in")
-        }
-        pop()
-    }
-
-    Text(
-        text = annotatedString,
-        fontSize = 20.sp,
-        fontWeight = FontWeight.Medium,
-        color = Color.Black,
-        modifier = Modifier.clickable {
-            navController.navigate(Screen.TeacherOverview.route) {
-            }
-        }
-    )
 }
