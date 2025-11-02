@@ -44,6 +44,8 @@ import com.example.mathquest.data.FirestoreService
 @Composable
 fun ClassOverviewScreen(navController: NavController, className: String) {
     val firestoreService = remember { FirestoreService() }
+    var searchQuery by remember { mutableStateOf("") }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -66,11 +68,17 @@ fun ClassOverviewScreen(navController: NavController, className: String) {
 
         Spacer(Modifier.height(8.dp))
 
-        SearchBar()
+        SearchBar(
+            query = searchQuery,
+            onQueryChange = {searchQuery = it}
+        )
 
         Spacer(Modifier.height(24.dp))
 
-        StudentTable(classId = className, firestoreService = firestoreService)
+        StudentTable(
+            classId = className,
+            firestoreService = firestoreService,
+            searchQuery = searchQuery)
 
         Spacer(Modifier.height(60.dp))
 
@@ -93,12 +101,10 @@ fun ClassOverviewScreen(navController: NavController, className: String) {
 }
 
 @Composable
-fun SearchBar() {
-    var query by remember { mutableStateOf(TextFieldValue("")) }
-
+fun SearchBar(query: String, onQueryChange: (String) -> Unit) {
     OutlinedTextField(
         value = query,
-        onValueChange = {query = it},
+        onValueChange = {onQueryChange(it)},
         placeholder = {
             Text(
                 "Search student",
@@ -122,11 +128,26 @@ fun SearchBar() {
 }
 
 @Composable
-fun StudentTable(classId: String, firestoreService: FirestoreService) {
-    var students by remember { mutableStateOf<List<String>>(emptyList()) }
+fun StudentTable(classId: String, firestoreService: FirestoreService, searchQuery: String) {
+    var allStudents by remember { mutableStateOf<List<String>>(emptyList()) }
+    var isLoading by remember { mutableStateOf(true) }
+    var error by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(classId) {
-        students = firestoreService.getStudentsByClassId(classId)
+        try {
+            allStudents = firestoreService.getStudentsByClassId(classId)
+        } catch (e: Exception) {
+            error = e.message
+        } finally {
+            isLoading = false
+        }
+    }
+
+    val filteredStudents = remember(allStudents, searchQuery) {
+        if (searchQuery.isBlank()) allStudents
+        else allStudents.filter {
+            it.contains(searchQuery, ignoreCase = true)
+        }
     }
 
     Card(
@@ -167,14 +188,19 @@ fun StudentTable(classId: String, firestoreService: FirestoreService) {
 
             Spacer(Modifier.height(8.dp))
 
-            students.forEach { name ->
-                Row(
-                    Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(name, color = Color.Black, fontSize = 16.sp)
-                    Text("-", color = Color.Black, fontSize = 16.sp)
-                    Text("-", color = Color.Black, fontSize = 16.sp)
+            when {
+                isLoading -> Text("Loading...", modifier = Modifier.padding(8.dp))
+                error != null -> Text("Error: $error", color = Color.Red)
+                filteredStudents.isEmpty() -> Text("No matching students", modifier = Modifier.padding(8.dp))
+                else -> filteredStudents.forEach { name ->
+                    Row(
+                        Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(name, color = Color.Black, fontSize = 16.sp)
+                        Text("-", color = Color.Black, fontSize = 16.sp)
+                        Text("-", color = Color.Black, fontSize = 16.sp)
+                    }
                 }
             }
         }
