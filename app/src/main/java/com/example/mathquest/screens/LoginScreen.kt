@@ -33,6 +33,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
 
 @Composable
@@ -108,10 +110,19 @@ fun LoginScreen(navController: NavController) {
                     isLoading = false
 
                     result.fold(
-                        onSuccess = {
-                            navController.navigate(Screen.GradeSelection.route) {
-                                popUpTo(Screen.Login.route) { inclusive = true }
-                            }
+                        onSuccess = { uid ->
+                            val db = FirebaseFirestore.getInstance()
+                            db.collection("students").document(uid).get()
+                                .addOnSuccessListener { doc ->
+                                    val grade = doc.getString("grade") ?: "1A"
+                                    navController.navigate("grade_selection/$grade") {
+                                        popUpTo(Screen.Login.route) { inclusive = true }
+                                    }
+                                }
+                                .addOnFailureListener { e ->
+                                    error = "Failed to fetch user grade: ${e.message}"
+                                }
+
                         },
                         onFailure = { e ->
                             error = when (e) {

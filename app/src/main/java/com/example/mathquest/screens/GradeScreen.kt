@@ -32,7 +32,7 @@ import androidx.navigation.NavController
 import com.example.mathquest.R
 
 @Composable
-fun GradeSelectionScreen(navController: NavController) {
+fun GradeSelectionScreen(navController: NavController, userGrade: String) {
     val grades: List<Triple<String, ImageVector, Color>> = listOf(
         Triple("1. grade", Icons.Filled.School, Color(0xFFFFF176)),
         Triple("2. grade", Icons.Filled.Calculate, Color(0xFFA5D6A7)),
@@ -41,6 +41,8 @@ fun GradeSelectionScreen(navController: NavController) {
         Triple("5. grade", Icons.AutoMirrored.Filled.MenuBook, Color(0xFFCE93D8)),
         Triple("6. grade", Icons.Filled.Star, Color(0xFFFFCC80))
     )
+
+    val gradeNumber = userGrade.firstOrNull()?.digitToIntOrNull() ?: 1
 
     Box(
         modifier = Modifier
@@ -72,7 +74,7 @@ fun GradeSelectionScreen(navController: NavController) {
             ) {
                 items(grades.indices.toList()) { index ->
                     val (text, icon, color) = grades[index]
-                    val isLocked = index != 0
+                    val isLocked = index + 1 > gradeNumber
 
                     Button(
                         onClick = { if (!isLocked) {navController.navigate("topic_selection")
