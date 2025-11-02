@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.mathquest.R
+import com.example.mathquest.data.FirestoreService
 import com.example.mathquest.navigation.Screen
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthException
@@ -40,6 +41,8 @@ fun LoginScreen(navController: NavController) {
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf<String?>(null) }
+    val firestoreService = remember { FirestoreService() }
+    var isLoading by remember { mutableStateOf(false) }
 
 
     val auth = FirebaseAuth.getInstance()
@@ -96,30 +99,28 @@ fun LoginScreen(navController: NavController) {
 
         Button(
             onClick = {
+                if (email.isBlank() || password.isBlank()) {
+                    error = "Please fill in all fields"
+                    return@Button
+                }
                 scope.launch {
-                    if (email.isBlank() || password.isBlank()) {
-                        error = "Please fill in all fields"
-                        return@launch
-                    }
+                    val result = firestoreService.signIn(email, password)
+                    isLoading = false
 
-                    auth.signInWithEmailAndPassword(email, password)
-                        .addOnCompleteListener { task ->
-                            if (task.isSuccessful) {
-                                if (error == null) {
-                                    navController.navigate(Screen.GradeSelection.route) {
-                                        popUpTo(Screen.Login.route) { inclusive = true }
-                                    }
-                                } else {
-                                    // TODO: currently not showing
-                                    val msg = task.exception?.message ?: "Login failed. Please try again."
-                                    error = when {
-                                        "no user record" in msg.lowercase() -> "No account found with this email."
-                                        "password is invalid" in msg.lowercase() -> "Invalid password. Please try again."
-                                        else -> msg
-                                    }
-                                }
+                    result.fold(
+                        onSuccess = {
+                            navController.navigate(Screen.GradeSelection.route) {
+                                popUpTo(Screen.Login.route) { inclusive = true }
+                            }
+                        },
+                        onFailure = { e ->
+                            error = when (e) {
+                                is FirebaseAuthInvalidUserException -> "No account found with this email."
+                                is FirebaseAuthInvalidCredentialsException -> "Invalid password. Please try again."
+                                else -> e.message ?: "Login failed. Please try again."
                             }
                         }
+                    )
                 }
             },
             modifier = Modifier

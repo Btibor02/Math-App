@@ -28,8 +28,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.mathquest.R
+import com.example.mathquest.data.FirestoreService
 import com.example.mathquest.data.UserProfile
-import com.example.mathquest.data.UserRepository
 import com.example.mathquest.navigation.Screen
 import kotlinx.coroutines.launch
 
@@ -45,7 +45,7 @@ fun RegistrationScreen(navController: NavController) {
     var error by remember { mutableStateOf<String?>(null) }
     var isLoading by remember {mutableStateOf(false)}
 
-    val repo = remember { UserRepository() }
+    val firestoreService = remember { FirestoreService() }
     val scope = rememberCoroutineScope()
 
     var passwordVisible by remember { mutableStateOf(false) }
@@ -234,10 +234,12 @@ fun RegistrationScreen(navController: NavController) {
                 isLoading = true
                 error = null
                 scope.launch {
-                    val result = repo.registerWithEmail(
+                    val result = firestoreService.registerStudent(
                         email,
                         password,
-                        UserProfile(username = username, grade = grade, joinCode = joinCode, isTeacher = false)
+                        username,
+                        grade,
+                        joinCode
                     )
                     isLoading = false
                     result.fold(
