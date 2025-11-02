@@ -29,7 +29,6 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.mathquest.R
 import com.example.mathquest.data.FirestoreService
-import com.example.mathquest.data.UserProfile
 import com.example.mathquest.navigation.Screen
 import kotlinx.coroutines.launch
 
