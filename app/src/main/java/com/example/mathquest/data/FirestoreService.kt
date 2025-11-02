@@ -2,6 +2,7 @@ package com.example.mathquest.data
 
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.tasks.await
 
@@ -38,14 +39,16 @@ class FirestoreService {
         email: String,
         password: String,
         username: String,
-        grade: String,
         joinCode: String
     ): Result<String> {
         return try {
             val result = auth.createUserWithEmailAndPassword(email, password).await()
             val uid = result.user?.uid ?: throw Exception("Missing UID")
 
-            val newStudent = Student(uid, username, grade, joinCode, email)
+            val classInfo = getClassByJoinCode(joinCode)
+                ?: throw Exception("Invalid join code")
+
+            val newStudent = Student(uid, username, classInfo.className, joinCode, email)
             studentsRef.document(uid).set(newStudent).await()
 
             Result.success(uid)
@@ -98,5 +101,26 @@ class FirestoreService {
     suspend fun getStudentById(uid: String): Student? {
         val snapshot = studentsRef.document(uid).get().await()
         return snapshot.toObject(Student::class.java)
+    }
+
+    suspend fun getClassByJoinCode(joinCode: String): ClassInfo? {
+        return try {
+            val querySnapshot = Firebase.firestore.collection("classes")
+                .whereEqualTo("joinCode", joinCode)
+                .get()
+                .await()
+            if (querySnapshot.isEmpty) null
+            else {
+                val doc = querySnapshot.documents[0]
+                ClassInfo(
+                    id = doc.getString("id") ?: "",
+                    className = doc.getString("className") ?: "",
+                    joinCode = doc.getString("joinCode") ?: "",
+                    teacherId = doc.getString("teacherId") ?: "",
+                )
+            }
+        } catch (e: Exception) {
+            null
+        }
     }
 }

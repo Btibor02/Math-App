@@ -29,6 +29,7 @@ import androidx.navigation.NavController
 import com.example.mathquest.R
 import com.example.mathquest.data.FirestoreService
 import com.example.mathquest.navigation.Screen
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -36,7 +37,6 @@ import kotlinx.coroutines.launch
 fun RegistrationScreen(navController: NavController) {
     var email by remember { mutableStateOf("") }
     var username by remember {mutableStateOf("")}
-    var grade by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember {mutableStateOf("")}
     var joinCode by remember { mutableStateOf("") }
@@ -48,9 +48,6 @@ fun RegistrationScreen(navController: NavController) {
 
     var passwordVisible by remember { mutableStateOf(false) }
     var confirmPasswordVisible by remember { mutableStateOf(false) }
-
-    val grades = listOf("1", "2", "3", "4", "5", "6")
-    var expanded by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -94,49 +91,6 @@ fun RegistrationScreen(navController: NavController) {
             shape = RoundedCornerShape(15.dp),
             textStyle = TextStyle(fontSize = 30.sp)
         )
-
-        Spacer(Modifier.height(16.dp))
-
-        ExposedDropdownMenuBox(
-            expanded = expanded,
-            onExpandedChange = { expanded = !expanded }
-        ) {
-            OutlinedTextField(
-                value = grade,
-                onValueChange = {},
-                label = { Text("Grade", fontSize = 20.sp) },
-                leadingIcon = { Icon(Icons.Default.Add, contentDescription = null) },
-                readOnly = true,
-                modifier = Modifier
-                    .menuAnchor()
-                    .height(80.dp)
-                    .width(350.dp),
-                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                shape = RoundedCornerShape(15.dp),
-                textStyle = TextStyle(fontSize = 30.sp)
-            )
-
-            ExposedDropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false }
-            ) {
-                grades.forEach {
-                    DropdownMenuItem(
-                        text = {
-                            Text(
-                                it,
-                                fontSize = 30.sp,
-                                modifier = Modifier.padding(vertical = 8.dp)
-                            )
-                        },
-                        onClick = {
-                            grade = it
-                            expanded = false
-                        }
-                    )
-                }
-            }
-        }
 
         Spacer(Modifier.height(16.dp))
 
@@ -200,7 +154,7 @@ fun RegistrationScreen(navController: NavController) {
 
         Button(
             onClick = {
-                if (email.isBlank() || password.isBlank() || grade.isBlank() || joinCode.isBlank()) {
+                if (email.isBlank() || password.isBlank() || joinCode.isBlank()) {
                     error = "Please fill all fields"
                     return@Button
                 }
@@ -232,19 +186,27 @@ fun RegistrationScreen(navController: NavController) {
                 isLoading = true
                 error = null
                 scope.launch {
+
                     val result = firestoreService.registerStudent(
                         email,
                         password,
                         username,
-                        grade,
                         joinCode
                     )
                     isLoading = false
                     result.fold(
-                        onSuccess = {
-                            navController.navigate(Screen.GradeSelection.route) {
-                                popUpTo (Screen.Main.route ) { inclusive = false }
-                            }
+                        onSuccess = { uid ->
+                            val db = FirebaseFirestore.getInstance()
+                            db.collection("students").document(uid).get()
+                                .addOnSuccessListener { doc ->
+                                    val grade = doc.getString("grade") ?: "1A"
+                                    navController.navigate("grade_selection/$grade") {
+                                        popUpTo(Screen.Registration.route) { inclusive = true }
+                                    }
+                                }
+                                .addOnFailureListener { e ->
+                                    error = "Failed to fetch user class: ${e.message}"
+                                }
                         },
                         onFailure = { e -> error = e.message}
                     )
