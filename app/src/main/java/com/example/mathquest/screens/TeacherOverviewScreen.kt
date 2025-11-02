@@ -223,7 +223,7 @@ fun ClassCard(className: String, iconColor: Color, navController: NavController)
                     modifier = Modifier
                         .padding(end = 16.dp)
                         .clickable {
-                        navController.navigate("class_overview" )
+                        navController.navigate("class_overview/$className" )
                     }
                 )
             }

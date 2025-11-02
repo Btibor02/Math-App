@@ -56,8 +56,9 @@ fun NavGraph(navController: NavHostController) {
         composable(Screen.TeacherOverview.route) {
             TeacherOverviewScreen(navController, firestoreService)
         }
-        composable(Screen.ClassOverview.route) {
-            ClassOverviewScreen(navController)
+        composable("class_overview/{className}") { backStackEntry ->
+            val className = backStackEntry.arguments?.getString("className") ?: "Unknown"
+            ClassOverviewScreen(navController, className)
         }
     }
 }

@@ -22,6 +22,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,9 +39,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.mathquest.R
+import com.example.mathquest.data.FirestoreService
 
 @Composable
-fun ClassOverviewScreen(navController: NavController) {
+fun ClassOverviewScreen(navController: NavController, className: String) {
+    val firestoreService = remember { FirestoreService() }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -51,7 +54,7 @@ fun ClassOverviewScreen(navController: NavController) {
         Spacer(Modifier.height(40.dp))
 
         Text(
-            text = "Class 5B - Overview",
+            text = "$className - Overview",
             fontSize = 36.sp,
             fontWeight = FontWeight.Bold,
             color = Color(0xFF214A80),
@@ -67,7 +70,7 @@ fun ClassOverviewScreen(navController: NavController) {
 
         Spacer(Modifier.height(24.dp))
 
-        StudentTable()
+        StudentTable(classId = className, firestoreService = firestoreService)
 
         Spacer(Modifier.height(60.dp))
 
@@ -119,13 +122,12 @@ fun SearchBar() {
 }
 
 @Composable
-fun StudentTable() {
-    val students = listOf(
-        Triple("Emma", 14, 22),
-        Triple("Leo", 9, 18),
-        Triple("Teo", 12, 21),
-        Triple("Joe", 10, 20)
-    )
+fun StudentTable(classId: String, firestoreService: FirestoreService) {
+    var students by remember { mutableStateOf<List<String>>(emptyList()) }
+
+    LaunchedEffect(classId) {
+        students = firestoreService.getStudentsByClassId(classId)
+    }
 
     Card(
         shape = RoundedCornerShape(16.dp),
@@ -165,26 +167,14 @@ fun StudentTable() {
 
             Spacer(Modifier.height(8.dp))
 
-            students.forEach { (name, logins, completed) ->
+            students.forEach { name ->
                 Row(
                     Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text(
-                        name,
-                        color = Color.Black,
-                        fontSize = 16.sp
-                    )
-                    Text(
-                        logins.toString(),
-                        color = Color.Black,
-                        fontSize = 16.sp
-                    )
-                    Text(
-                        completed.toString(),
-                        color = Color.Black,
-                        fontSize = 16.sp
-                    )
+                    Text(name, color = Color.Black, fontSize = 16.sp)
+                    Text("-", color = Color.Black, fontSize = 16.sp)
+                    Text("-", color = Color.Black, fontSize = 16.sp)
                 }
             }
         }

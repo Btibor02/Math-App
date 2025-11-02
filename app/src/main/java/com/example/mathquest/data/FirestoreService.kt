@@ -137,4 +137,14 @@ class FirestoreService {
             emptyList()
         }
     }
+
+    suspend fun getStudentsByClassId(classId: String): List<String> {
+        val snapshot = Firebase.firestore
+            .collection("students")
+            .whereEqualTo("grade", classId)
+            .get()
+            .await()
+
+        return snapshot.documents.mapNotNull { it.getString("username") }
+    }
 }
