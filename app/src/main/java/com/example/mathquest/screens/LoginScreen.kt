@@ -4,6 +4,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -16,6 +19,8 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
@@ -23,11 +28,22 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.mathquest.R
 import com.example.mathquest.navigation.Screen
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthException
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
+import com.google.firebase.auth.FirebaseAuthInvalidUserException
+import kotlinx.coroutines.launch
 
 @Composable
 fun LoginScreen(navController: NavController) {
-    var username by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var passwordVisible by remember { mutableStateOf(false) }
+    var error by remember { mutableStateOf<String?>(null) }
+
+
+    val auth = FirebaseAuth.getInstance()
+    val scope = rememberCoroutineScope()
 
     Column(
         modifier = Modifier
@@ -45,12 +61,10 @@ fun LoginScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(60.dp))
 
-
-        // TODO: Change to email
         OutlinedTextField(
-            value = username,
-            onValueChange = { username = it },
-            label = { Text("Username") },
+            value = email,
+            onValueChange = { email = it },
+            label = { Text("Email") },
             modifier = Modifier
                 .height(80.dp)
                 .width(350.dp),
@@ -69,15 +83,45 @@ fun LoginScreen(navController: NavController) {
                 .width(350.dp),
             shape = RoundedCornerShape(15.dp),
             textStyle = TextStyle(fontSize = 40.sp),
-            visualTransformation = PasswordVisualTransformation()
+            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+            trailingIcon = {
+                val icon = if (passwordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility
+                IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                    Icon(icon, contentDescription = if (passwordVisible) "Hide password" else "Show password")
+                }
+            }
         )
 
         Spacer(Modifier.height(32.dp))
 
         Button(
-            onClick = { navController.navigate(Screen.GradeSelection.route) {
-                popUpTo(Screen.Main.route) { inclusive = false }
-            } },
+            onClick = {
+                scope.launch {
+                    if (email.isBlank() || password.isBlank()) {
+                        error = "Please fill in all fields"
+                        return@launch
+                    }
+
+                    auth.signInWithEmailAndPassword(email, password)
+                        .addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                if (error == null) {
+                                    navController.navigate(Screen.GradeSelection.route) {
+                                        popUpTo(Screen.Login.route) { inclusive = true }
+                                    }
+                                } else {
+                                    // TODO: currently not showing
+                                    val msg = task.exception?.message ?: "Login failed. Please try again."
+                                    error = when {
+                                        "no user record" in msg.lowercase() -> "No account found with this email."
+                                        "password is invalid" in msg.lowercase() -> "Invalid password. Please try again."
+                                        else -> msg
+                                    }
+                                }
+                            }
+                        }
+                }
+            },
             modifier = Modifier
                 .height(80.dp)
                 .width(350.dp),
@@ -91,6 +135,11 @@ fun LoginScreen(navController: NavController) {
                 fontFamily = FontFamily(Font(R.font.nunito_extrabold)),
                 fontSize = 40.sp
             )
+        }
+
+        error?.let {
+            Spacer(modifier = Modifier.height(20.dp))
+            Text(it, color = Color.Red, textAlign = TextAlign.Center)
         }
 
         Spacer(modifier = Modifier.height(30.dp))
