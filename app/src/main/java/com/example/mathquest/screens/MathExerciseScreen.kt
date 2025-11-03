@@ -39,11 +39,27 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.mathquest.R
+import com.example.mathquest.mathlogic.AdditionLogic
+import com.example.mathquest.mathlogic.SubstractionLogic
+import com.example.mathquest.mathlogic.MultiplicationLogic
+import com.example.mathquest.mathlogic.DivisionLogic
 
 @Composable
 fun MathExerciseScreen(navController: NavController, topic: String) {
     var answer by remember { mutableStateOf("") }
     val fontFamily = FontFamily(Font(R.font.nunito_extrabold))
+
+    val grade = 2
+
+    val question = remember(topic) {
+        when (topic) {
+            "Add" -> AdditionLogic.generateQuestion(grade)
+            "Subtract" -> SubstractionLogic.generateQuestion(grade)
+            "Multiply" -> MultiplicationLogic.generateQuestion(grade)
+            "Divide" -> DivisionLogic.generateQuestion(grade)
+            else -> "?"
+        }
+    }
 
     val topicFullNames = mapOf(
         "Add" to "Addition",
@@ -82,7 +98,7 @@ fun MathExerciseScreen(navController: NavController, topic: String) {
         Spacer(Modifier.height(24.dp))
 
         Text(
-            text = "2 + 3",
+            text = question,
             fontSize = 70.sp,
             fontWeight = FontWeight.Bold,
             color = Color.Black,

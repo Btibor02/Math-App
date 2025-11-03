@@ -107,8 +107,8 @@ object DivisionLogic{
     private fun divisionRange(grade : Int): IntRange{
         //placeholders for now
         return when (grade){
-            2 -> 0..10
-            3 -> 0..50
+            2 -> 1..10
+            3 -> 1..50
             4 -> 11..200
             else -> 0..12
         }
