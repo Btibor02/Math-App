@@ -25,6 +25,7 @@ import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,6 +48,7 @@ import com.example.mathquest.mathlogic.AnswerVerifier
 import com.example.mathquest.mathlogic.SubstractionLogic
 import com.example.mathquest.mathlogic.MultiplicationLogic
 import com.example.mathquest.mathlogic.DivisionLogic
+import com.example.mathquest.mathlogic.TimerLogic
 
 @Composable
 fun MathExerciseScreen(navController: NavController, topic: String) {
@@ -76,6 +78,17 @@ fun MathExerciseScreen(navController: NavController, topic: String) {
     )
 
     val displayName = topicFullNames[topic] ?: topic
+
+    var remainingTime by remember { mutableStateOf(60) }
+    var timeUp by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        TimerLogic.startTimer(
+            seconds = 60,
+            onTick = { remainingTime = it},
+            onFinish = { timeUp = true }
+        )
+    }
 
     Column(
         modifier = Modifier
@@ -131,7 +144,7 @@ fun MathExerciseScreen(navController: NavController, topic: String) {
             singleLine = true,
             modifier = Modifier
                 .width(250.dp)
-                .height(100.dp)
+                .height(70.dp)
         )
 
         Spacer(Modifier.height(32.dp))
@@ -142,15 +155,17 @@ fun MathExerciseScreen(navController: NavController, topic: String) {
                 val numericValue = answerInput.toDoubleOrNull()
                 if (numericValue != null) {
                     val isCorrect = AnswerVerifier.verifyAnswer(numericValue)
-                    feedback = if (isCorrect) {
-                        "✅ Correct!"
+                    if (isCorrect) {
+                        feedback = "✅ Correct!"
+                        TimerLogic.stopTimer()
                     } else {
-                        "❌ Wrong! Correct answer: ${AnswerVerifier.getRightAnswer()}"
+                        feedback =  "❌ Wrong! Correct answer: ${AnswerVerifier.getRightAnswer()}"
                     }
                 } else {
                     feedback = "Please enter a valid number"
                 }
             },
+            enabled = !timeUp,
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFD54F)),
             shape = RoundedCornerShape(16.dp),
             modifier = Modifier
@@ -169,7 +184,7 @@ fun MathExerciseScreen(navController: NavController, topic: String) {
         Spacer(Modifier.height(30.dp))
 
         Text(
-            text = feedback,
+            text = if (!timeUp) feedback else "⏰ Time's up!",
             fontSize = 24.sp,
             fontFamily = FontFamily(Font(R.font.nunito_extrabold)),
             color = if (feedback.startsWith("✅")) Color(0xFF2E7D32) else Color(0xFFD32F2F)
@@ -184,7 +199,7 @@ fun MathExerciseScreen(navController: NavController, topic: String) {
                 .padding(horizontal = 16.dp, vertical = 6.dp)
         ) {
             Text(
-                "1:00",
+                "${remainingTime}s",
                 color = Color.Black,
                 fontFamily = fontFamily,
                 fontSize = 18.sp

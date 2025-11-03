@@ -144,7 +144,13 @@ object AnswerVerifier{
 
     //if studetn answer is wring return false Bollean
     fun verifyAnswer(studentAnswer: Number): Boolean{
-        return correctAnswer == studentAnswer.toDouble()
+        val correct = correctAnswer ?: return false
+        return if (correct % 1.0 == 0.0) {
+            correct.toInt() == studentAnswer.toInt()
+        } else {
+            return correctAnswer == studentAnswer.toDouble()
+        }
+
     }
 
     fun getRightAnswer(): Double? = correctAnswer
