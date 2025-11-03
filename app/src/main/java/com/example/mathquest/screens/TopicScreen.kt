@@ -19,7 +19,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.HorizontalRule
-import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Percent
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -28,7 +27,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.TextStyle
@@ -81,17 +79,14 @@ fun TopicSelectionScreen(navController: NavController) {
             ) {
                 items(topics.indices.toList()) { index ->
                     val (text, icon, color) = topics[index]
-                    val isLocked = index != 0
 
                     Button(
-                        onClick = { if (!isLocked) { /* TODO: Navigate to exercises */ } },
+                        onClick =  { navController.navigate("math_exercise/$text") },
                         modifier = Modifier
                             .height(120.dp)
-                            .width(350.dp)
-                            .alpha(if (isLocked) 0.5f else 1f),
+                            .width(350.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = color),
                         shape = RoundedCornerShape(15.dp),
-                        enabled = !isLocked
                     ) {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -112,14 +107,6 @@ fun TopicSelectionScreen(navController: NavController) {
                                     color = Color(0xFF214A80),
                                     fontWeight = FontWeight.Medium,
                                     fontFamily = FontFamily(Font(R.font.nunito_extrabold))
-                                )
-                            }
-                            if (isLocked) {
-                                Icon(
-                                    imageVector = Icons.Filled.Lock,
-                                    contentDescription = "Locked",
-                                    tint = Color(0xFF0D47A1),
-                                    modifier = Modifier.size(36.dp)
                                 )
                             }
                         }
