@@ -107,7 +107,7 @@ fun MathExerciseScreen(
 
         Text(
             text = question,
-            fontSize = 70.sp,
+            fontSize = 40.sp,
             fontWeight = FontWeight.Bold,
             color = Color.Black,
             fontFamily = fontFamily
@@ -137,7 +137,7 @@ fun MathExerciseScreen(
 
         Spacer(Modifier.height(32.dp))
 
-        if (!timeUp && feedback.isEmpty()) {
+        if (!timeUp && (feedback == "Please enter a valid number" || feedback.isEmpty()) ) {
             Button(
                 onClick = {
                     focusManager.clearFocus()
@@ -149,7 +149,7 @@ fun MathExerciseScreen(
                             correctAnswers++
                             TimerLogic.stopTimer()
                         } else {
-                            feedback = "❌ Wrong! Correct: ${AnswerVerifier.getRightAnswer()}"
+                            feedback = "❌ Wrong!\nCorrect: ${AnswerVerifier.getRightAnswer()}"
                             TimerLogic.stopTimer()
                         }
                     } else {

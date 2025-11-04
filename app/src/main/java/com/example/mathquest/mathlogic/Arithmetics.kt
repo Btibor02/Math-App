@@ -12,146 +12,106 @@ import kotlin.math.round
 //then verify user answer with AnswerVerifier.verifyAnswer(studentAnswer)
 //or get the correct answer with AnswerVerifier.getRightAnswer()
 
-object AdditionLogic{
-    private fun additionRange(grade: Int): IntRange{
+object GradeRanges {
+    val additionSubtractionRanges = mapOf(
+        1 to 0..20,
+        2 to 10..99,
+        3 to 50..999,
+        4 to 100..9999,
+        5 to 1000..99999,
+        6 to 10000..99999
+    )
 
-        //depending on the grade random gen will make questions with these ranges
-        return when (grade){
-             1 -> 0..9
-            2 -> 10..99
-            3 -> 100..999
-            4 -> 1000..9999
-            else -> 0..9
-        }
-    }
+    val multiplicationRanges = mapOf(
+        2 to 0..12,
+        3 to 5..50,
+        4 to 10..200,
+        5 to 50..500,
+        6 to 100..1000
+    )
 
-    fun generateQuestion(grade: Int): String{
-        val range = additionRange(grade)
+    val divisionRanges = mapOf(
+        2 to 1..10,
+        3 to 2..50,
+        4 to 10..200,
+        5 to 50..500,
+        6 to 100..1000
+    )
+}
 
-        val a = Random.nextInt(range.first, range.last +1)
-        val b = Random.nextInt(range.first, range.last +1)
-
+object AdditionLogic {
+    fun generateQuestion(grade: Int): String {
+        val range = GradeRanges.additionSubtractionRanges[grade] ?: 0..20
+        val a = Random.nextInt(range.first, range.last + 1)
+        val b = Random.nextInt(range.first, range.last + 1)
         AnswerVerifier.setCorrectAnswer(a + b)
         return "$a + $b"
     }
-
 }
 
-//export SubstractionLogic obj
-//call com.example.mathquest.mathlogic.Arithmetics
-//call substractionLogic.generateQuestion(grade =?) -> grade 1-4 gives diff difficulty level
+object SubstractionLogic {
+    fun generateQuestion(grade: Int): String {
+        val range = GradeRanges.additionSubtractionRanges[grade] ?: 0..20
+        var a = Random.nextInt(range.first, range.last + 1)
+        var b = Random.nextInt(range.first, range.last + 1)
 
-object SubstractionLogic{
-    private fun substractionRange(grade: Int): IntRange{
-
-        //depending on the grade random gen will make questions with these ranges
-        return when (grade){
-            1 -> 0..9
-            2 -> 10..99
-            3 -> 100..999
-            4 -> 1000..9999
-            else -> 0..9
-        }
-    }
-
-    fun generateQuestion(grade: Int): String{
-        val range = substractionRange(grade)
-
-        var a = Random.nextInt(range.first, range.last +1)
-        var b = Random.nextInt(range.first, range.last +1)
-
-        //make sure we dont go into negatives
-        if (a < b){
+        if (a < b) {
             val temp = a
             a = b
             b = temp
         }
-        AnswerVerifier.setCorrectAnswer(a-b)
+
+        AnswerVerifier.setCorrectAnswer(a - b)
         return "$a - $b"
     }
 }
 
-//export MultiplicationLogic obj
-//call com.example.mathquest.mathlogic.Arithmetics
-//call MultiplicationLogic.generateQuestion(grade =?) -> grade 2-4 gives diff difficulty level
-
-object MultiplicationLogic{
-
-    private fun multiplicationRange(grade : Int): IntRange{
-        //placeholders for now
-        return when (grade){
-            2 -> 0..12
-            3 -> 0..50
-            4 -> 11..200
-            else -> 0..12
-        }
-    }
-
-    fun generateQuestion(grade: Int): String{
-        val range = multiplicationRange(grade)
-
-        val a = Random.nextInt(range.first, range.last +1)
-        val b = Random.nextInt(range.first, range.last +1)
-
+object MultiplicationLogic {
+    fun generateQuestion(grade: Int): String {
+        val range = GradeRanges.multiplicationRanges[grade] ?: 0..12
+        val a = Random.nextInt(range.first, range.last + 1)
+        val b = Random.nextInt(range.first, range.last + 1)
         AnswerVerifier.setCorrectAnswer(a * b)
         return "$a * $b"
     }
 }
 
-//export DivisionLogic obj
-//call com.example.mathquest.mathlogic.Arithmetics
-//call DivisionLogic.generateQuestion(grade =?) -> grade 2-4 gives diff difficulty level
+object DivisionLogic {
+    fun generateQuestion(grade: Int): String {
+        val range = GradeRanges.divisionRanges[grade] ?: 1..12
+        var a = Random.nextInt(range.first, range.last + 1)
+        var b = Random.nextInt(range.first, range.last + 1)
 
-object DivisionLogic{
-
-    private fun divisionRange(grade : Int): IntRange{
-        //placeholders for now
-        return when (grade){
-            2 -> 1..10
-            3 -> 1..50
-            4 -> 11..200
-            else -> 0..12
-        }
-    }
-
-    fun generateQuestion(grade: Int): String{
-        val range = divisionRange(grade)
-
-        var a = Random.nextInt(range.first, range.last +1)
-        var b = Random.nextInt(range.first, range.last +1)
-
-        //for easier grade dont divide smaller with bigger number
-        if (grade == 2 && a <b){
+        if (grade <= 3 && a < b) {
             val temp = a
             a = b
             b = temp
         }
 
-        val answer = round((a.toDouble()/ b) * 100)/100
+        val answer: Number = if (a % b == 0) a / b else round((a.toDouble() / b) * 100) / 100
         AnswerVerifier.setCorrectAnswer(answer)
-
         return "$a / $b"
     }
 }
 
 object AnswerVerifier{
-    private var correctAnswer: Double? = null
+    private var correctAnswer: Number? = null
 
     //store corect answer
     fun setCorrectAnswer(answer: Number){
-        correctAnswer = answer.toDouble()
+        correctAnswer = answer
     }
 
     //if studetn answer is wring return false Bollean
     fun verifyAnswer(studentAnswer: Number): Boolean{
         val correct = correctAnswer ?: return false
-        return if (correct % 1.0 == 0.0) {
-            correct.toInt() == studentAnswer.toInt()
+        return if (correct is Double) {
+            correct == studentAnswer.toDouble()
         } else {
-            return correctAnswer == studentAnswer.toDouble()
+            correct.toInt() == studentAnswer.toInt()
         }
 
     }
 
-    fun getRightAnswer(): Double? = correctAnswer
+    fun getRightAnswer(): Number? = correctAnswer
 }
