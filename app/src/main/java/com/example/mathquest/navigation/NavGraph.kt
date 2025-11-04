@@ -7,7 +7,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.mathquest.screens.ClassOverviewScreen
-import com.example.mathquest.screens.GradeSelectionScreen
 import com.example.mathquest.screens.MainScreen
 import com.example.mathquest.screens.LoginScreen
 import com.example.mathquest.screens.RegistrationScreen
@@ -16,17 +15,18 @@ import com.example.mathquest.screens.TopicSelectionScreen
 import androidx.navigation.NavType
 import com.example.mathquest.data.FirestoreService
 import com.example.mathquest.screens.MathExerciseScreen
+import com.example.mathquest.screens.StudentMenuScreen
 
 
 sealed class Screen(val route: String) {
     object Main : Screen("main")
     object Login : Screen("login")
     object Registration : Screen("registration")
-    object GradeSelection : Screen("grade_selection")
     object TopicSelection : Screen("topic_selection")
     object TeacherOverview : Screen("teacher_overview")
     object ClassOverview : Screen("class_overview")
     object MathExercise : Screen("math_exercise")
+    object StudentMenu : Screen("student_menu")
 }
 
 @Composable
@@ -45,13 +45,7 @@ fun NavGraph(navController: NavHostController) {
         composable(Screen.Registration.route) {
             RegistrationScreen(navController)
         }
-        composable(
-            route = "grade_selection/{userGrade}",
-            arguments = listOf(navArgument("userGrade") { type = NavType.StringType })
-        ) { backStackEntry ->
-            val userGrade = backStackEntry.arguments?.getString("userGrade") ?: "1A"
-            GradeSelectionScreen(navController = navController, userGrade = userGrade)
-        }
+
         composable(Screen.TopicSelection.route) {
             TopicSelectionScreen(navController)
         }
@@ -65,6 +59,9 @@ fun NavGraph(navController: NavHostController) {
         composable("math_exercise/{topic}") { backStackEntry ->
             val topic = backStackEntry.arguments?.getString("topic") ?: "Math"
             MathExerciseScreen(navController, topic)
+        }
+        composable(Screen.StudentMenu.route) {
+            StudentMenuScreen(navController)
         }
     }
 }

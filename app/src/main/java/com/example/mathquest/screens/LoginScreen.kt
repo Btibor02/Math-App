@@ -127,8 +127,7 @@ fun LoginScreen(navController: NavController) {
                             db.collection("students").document(uid).get()
                                 .addOnSuccessListener { studentDoc ->
                                     if (studentDoc.exists()) {
-                                        val grade = studentDoc.getString("grade") ?: "1A"
-                                        navController.navigate("grade_selection/$grade") {
+                                        navController.navigate(Screen.StudentMenu.route) {
                                             popUpTo(Screen.Login.route) { inclusive = true }
                                         }
                                     } else {

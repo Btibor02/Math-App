@@ -222,8 +222,7 @@ fun RegistrationScreen(navController: NavController) {
                             val db = FirebaseFirestore.getInstance()
                             db.collection("students").document(uid).get()
                                 .addOnSuccessListener { doc ->
-                                    val grade = doc.getString("grade") ?: "1A"
-                                    navController.navigate("grade_selection/$grade") {
+                                    navController.navigate(Screen.StudentMenu.route) {
                                         popUpTo(Screen.Registration.route) { inclusive = true }
                                     }
                                 }
