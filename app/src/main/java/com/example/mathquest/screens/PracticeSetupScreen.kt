@@ -92,7 +92,7 @@ fun PracticeSetupScreen(
         Button(
             onClick = {
                 navController.navigate(
-                    "mathExercise/$selectedGrade/$selectedTaskCount/$selectedTime/$selectedOperation"
+                    "math_exercise/$selectedGrade/$selectedOperation/$selectedTaskCount/$selectedTime"
                 )
             },
             modifier = Modifier

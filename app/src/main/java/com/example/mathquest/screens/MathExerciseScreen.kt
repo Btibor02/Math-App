@@ -51,40 +51,28 @@ import com.example.mathquest.mathlogic.DivisionLogic
 import com.example.mathquest.mathlogic.TimerLogic
 
 @Composable
-fun MathExerciseScreen(navController: NavController, topic: String) {
-    var answer by remember { mutableStateOf("") }
+fun MathExerciseScreen(
+    navController: NavController,
+    grade: Int,
+    operation: String,
+    questionCount: Int,
+    timePerQuestion: Int
+    ) {
+    var currentQuestionIndex by remember { mutableStateOf(1) }
+    var question by remember { mutableStateOf(generateQuestion(operation, grade)) }
     var answerInput by remember { mutableStateOf("") }
     var feedback by remember { mutableStateOf("") }
     val focusManager = LocalFocusManager.current
     val fontFamily = FontFamily(Font(R.font.nunito_extrabold))
-
-    val grade = 2
-
-    val question = remember(topic) {
-        when (topic) {
-            "Add" -> AdditionLogic.generateQuestion(grade)
-            "Subtract" -> SubstractionLogic.generateQuestion(grade)
-            "Multiply" -> MultiplicationLogic.generateQuestion(grade)
-            "Divide" -> DivisionLogic.generateQuestion(grade)
-            else -> "?"
-        }
-    }
-
-    val topicFullNames = mapOf(
-        "Add" to "Addition",
-        "Subtract" to "Subtraction",
-        "Multiply" to "Multiplication",
-        "Divide" to "Division"
-    )
-
-    val displayName = topicFullNames[topic] ?: topic
+    var correctAnswers by remember { mutableStateOf(0) }
 
     var remainingTime by remember { mutableStateOf(60) }
     var timeUp by remember { mutableStateOf(false) }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(currentQuestionIndex) {
+        timeUp = false
         TimerLogic.startTimer(
-            seconds = 60,
+            seconds = timePerQuestion,
             onTick = { remainingTime = it},
             onFinish = { timeUp = true }
         )
@@ -99,8 +87,8 @@ fun MathExerciseScreen(navController: NavController, topic: String) {
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = displayName,
-            fontSize = 50.sp,
+            text = "$operation (${currentQuestionIndex}/$questionCount)",
+            fontSize = 40.sp,
             fontWeight = FontWeight.Bold,
             color = Color(0xFF214A80),
             fontFamily = fontFamily
@@ -149,36 +137,60 @@ fun MathExerciseScreen(navController: NavController, topic: String) {
 
         Spacer(Modifier.height(32.dp))
 
-        Button(
-            onClick = {
-                focusManager.clearFocus()
-                val numericValue = answerInput.toDoubleOrNull()
-                if (numericValue != null) {
-                    val isCorrect = AnswerVerifier.verifyAnswer(numericValue)
-                    if (isCorrect) {
-                        feedback = "✅ Correct!"
-                        TimerLogic.stopTimer()
+        if (!timeUp && feedback.isEmpty()) {
+            Button(
+                onClick = {
+                    focusManager.clearFocus()
+                    val numericValue = answerInput.toDoubleOrNull()
+                    if (numericValue != null) {
+                        val isCorrect = AnswerVerifier.verifyAnswer(numericValue)
+                        if (isCorrect) {
+                            feedback = "✅ Correct!"
+                            correctAnswers++
+                            TimerLogic.stopTimer()
+                        } else {
+                            feedback = "❌ Wrong! Correct: ${AnswerVerifier.getRightAnswer()}"
+                            TimerLogic.stopTimer()
+                        }
                     } else {
-                        feedback =  "❌ Wrong! Correct answer: ${AnswerVerifier.getRightAnswer()}"
+                        feedback = "Please enter a valid number"
                     }
-                } else {
-                    feedback = "Please enter a valid number"
-                }
-            },
-            enabled = !timeUp,
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFD54F)),
-            shape = RoundedCornerShape(16.dp),
-            modifier = Modifier
-                .width(200.dp)
-                .height(70.dp)
-        ) {
-            Text(
-                "Submit",
-                color = Color.Black,
-                fontFamily = fontFamily,
-                fontWeight = FontWeight.Bold,
-                fontSize = 35.sp
-            )
+                },
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFD54F)),
+                shape = RoundedCornerShape(16.dp),
+                modifier = Modifier
+                    .width(200.dp)
+                    .height(70.dp)
+            ) {
+                Text("Submit", fontSize = 30.sp, fontFamily = fontFamily)
+            }
+        } else {
+            Button(
+                onClick = {
+                    if (currentQuestionIndex < questionCount) {
+                        currentQuestionIndex++
+                        question = generateQuestion(operation, grade)
+                        feedback = ""
+                        answerInput = ""
+                    } else {
+                        TimerLogic.stopTimer()
+                        navController.navigate("student_menu") {
+                            popUpTo("student_menu") { inclusive = true }
+                        }
+                    }
+                },
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4DA6FF)),
+                shape = RoundedCornerShape(16.dp),
+                modifier = Modifier
+                    .width(200.dp)
+                    .height(70.dp)
+            ) {
+                Text(
+                    if (currentQuestionIndex < questionCount) "Next" else "Finish",
+                    fontSize = 30.sp,
+                    fontFamily = fontFamily
+                )
+            }
         }
 
         Spacer(Modifier.height(30.dp))
@@ -205,5 +217,15 @@ fun MathExerciseScreen(navController: NavController, topic: String) {
                 fontSize = 18.sp
             )
         }
+    }
 }
+
+private fun generateQuestion(operation: String, grade: Int): String {
+    return when (operation) {
+        "Addition" -> AdditionLogic.generateQuestion(grade)
+        "Subtraction" -> SubstractionLogic.generateQuestion(grade)
+        "Multiplication" -> MultiplicationLogic.generateQuestion(grade)
+        "Division" -> DivisionLogic.generateQuestion(grade)
+        else -> "?"
+    }
 }

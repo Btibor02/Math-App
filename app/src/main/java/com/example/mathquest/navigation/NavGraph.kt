@@ -58,9 +58,19 @@ fun NavGraph(navController: NavHostController) {
             val className = backStackEntry.arguments?.getString("className") ?: "Unknown"
             ClassOverviewScreen(navController, className)
         }
-        composable("math_exercise/{topic}") { backStackEntry ->
-            val topic = backStackEntry.arguments?.getString("topic") ?: "Math"
-            MathExerciseScreen(navController, topic)
+        composable("math_exercise/{grade}/{operation}/{questionCount}/{timePerQuestion}") { backStackEntry ->
+            val grade = backStackEntry.arguments?.getString("grade")?.toIntOrNull() ?: 1
+            val operation = backStackEntry.arguments?.getString("operation") ?: "Add"
+            val questionCount = backStackEntry.arguments?.getString("questionCount")?.toIntOrNull() ?: 10
+            val timePerQuestion = backStackEntry.arguments?.getString("timePerQuestion")?.toIntOrNull() ?: 30
+
+            MathExerciseScreen(
+                navController = navController,
+                grade = grade,
+                operation = operation,
+                questionCount = questionCount,
+                timePerQuestion = timePerQuestion
+            )
         }
         composable(Screen.StudentMenu.route) {
             StudentMenuScreen(navController, firestoreService)
