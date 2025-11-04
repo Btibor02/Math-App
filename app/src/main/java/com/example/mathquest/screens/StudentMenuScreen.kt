@@ -3,6 +3,7 @@ package com.example.mathquest.screens
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -13,6 +14,11 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -22,9 +28,30 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.mathquest.R
+import com.example.mathquest.data.FirestoreService
+import com.google.firebase.auth.FirebaseAuth
 
 @Composable
-fun StudentMenuScreen(navController: NavController) {
+fun StudentMenuScreen(navController: NavController, firestoreService: FirestoreService) {
+    var studentName by remember {mutableStateOf("Student")}
+    var studentGrade: Int? by remember { mutableStateOf(1) }
+    var error by remember { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(Unit) {
+        val uid = FirebaseAuth.getInstance().currentUser?.uid
+        if (uid != null) {
+            try {
+                val student = firestoreService.getStudentById(uid)
+                studentName = student?.username ?: "Student"
+
+                val gradeString = student?.grade ?: "1"
+                studentGrade = gradeString.filter { it.isDigit() }.toIntOrNull()
+            } catch (e: Exception) {
+                error = e.message
+            }
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -34,15 +61,16 @@ fun StudentMenuScreen(navController: NavController) {
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "Welcome, Student!",
+            text = "Welcome, ${studentName}!",
             fontSize = 32.sp,
             fontFamily = FontFamily(Font(R.font.nunito_extrabold)),
             color = Color(0xFF214A80),
-            modifier = Modifier.padding(bottom = 48.dp)
         )
 
+        Spacer(Modifier.height(70.dp))
+
         Button(
-            onClick = { /* TODO */ },
+            onClick = { navController.navigate("practice_setup/$studentGrade") },
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4DA6FF)),
             modifier = Modifier
                 .padding(vertical = 8.dp)
@@ -70,7 +98,6 @@ fun StudentMenuScreen(navController: NavController) {
             onClick = { /* TODO */ },
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4DA6FF)),
             modifier = Modifier
-                .fillMaxWidth()
                 .padding(vertical = 8.dp)
                 .height(80.dp)
                 .width(350.dp),
