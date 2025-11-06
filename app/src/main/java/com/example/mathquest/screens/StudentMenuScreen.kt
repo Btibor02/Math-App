@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.mathquest.R
 import com.example.mathquest.data.FirestoreService
+import com.example.mathquest.navigation.Screen
 import com.google.firebase.auth.FirebaseAuth
 
 @Composable
@@ -95,7 +96,7 @@ fun StudentMenuScreen(navController: NavController, firestoreService: FirestoreS
         }
 
         Button(
-            onClick = { /* TODO */ },
+            onClick = { navController.navigate(Screen.Leaderboard.route) },
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4DA6FF)),
             modifier = Modifier
                 .padding(vertical = 8.dp)

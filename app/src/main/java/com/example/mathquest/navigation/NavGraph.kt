@@ -14,6 +14,7 @@ import com.example.mathquest.data.FirestoreService
 import com.example.mathquest.screens.MathExerciseScreen
 import com.example.mathquest.screens.PracticeSetupScreen
 import com.example.mathquest.screens.StudentMenuScreen
+import com.example.mathquest.screens.LeaderboardScreen
 
 
 sealed class Screen(val route: String) {
@@ -25,6 +26,7 @@ sealed class Screen(val route: String) {
     object MathExercise : Screen("math_exercise")
     object StudentMenu : Screen("student_menu")
     object PracticeSetup : Screen("practice_setup")
+    object Leaderboard : Screen("leaderboard")
 }
 
 @Composable
@@ -72,6 +74,10 @@ fun NavGraph(navController: NavHostController) {
             "practice_setup/{studentGrade}") { backStackEntry ->
             val studentGrade = backStackEntry.arguments?.getString("studentGrade")?.toIntOrNull() ?: 1
             PracticeSetupScreen(navController, studentGrade)
+        }
+
+        composable(Screen.Leaderboard.route) {
+            LeaderboardScreen(navController)
         }
     }
 }
